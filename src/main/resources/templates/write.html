@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>오늘의 Two-Do 작성</title>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="write-page">
+<div class="write-box">
+    <a href="/dashboard" class="back-link">← 대시보드</a>
+    <h2>오늘의 Two-Do 작성</h2>
+    <p class="hint" id="timeHint"></p>
+
+    <form method="post" action="/write">
+        <div class="section-label">✦ Two 목표 (필수 2개)</div>
+        <input type="text" name="two1" placeholder="첫 번째 핵심 목표" required maxlength="100"/>
+        <input type="text" name="two2" placeholder="두 번째 핵심 목표" required maxlength="100"/>
+
+        <div class="section-label extra-label">+ 추가 목표 (선택)</div>
+        <div id="extraList">
+            <input type="text" name="extras" placeholder="추가 목표 1" maxlength="100"/>
+        </div>
+        <button type="button" class="btn btn-outline small" onclick="addExtra()">+ 목표 추가</button>
+
+        <button type="submit" class="btn btn-primary w-full mt">작성 완료</button>
+    </form>
+</div>
+<script>
+    function addExtra() {
+      const list = document.getElementById('extraList');
+      const cnt = list.children.length + 1;
+      const inp = document.createElement('input');
+      inp.type = 'text'; inp.name = 'extras';
+      inp.placeholder = '추가 목표 ' + cnt; inp.maxLength = 100;
+      list.appendChild(inp);
+    }
+    const h = new Date().getHours();
+    const hint = document.getElementById('timeHint');
+    if (h < 10) hint.textContent = '🌅 오전 10시 이전! 조기 작성 보너스 +5 포인트 획득!';
+    else hint.textContent = '오늘의 목표를 설정하세요.';
+</script>
+</body>
+</html>

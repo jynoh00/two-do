@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Two-Do 대시보드</title>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="dashboard-page">
+<header>
+    <span class="logo">✦ Two-Do</span>
+    <span class="user-info">
+      <span th:text="${user.nickname}"></span>
+      <span class="points-badge" th:text="'⭐ ' + ${user.totalPoints} + 'pt'"></span>
+    </span>
+    <a href="/logout" class="btn btn-outline small">로그아웃</a>
+</header>
+
+<div class="dashboard-content">
+
+    <!-- 오늘 작성 안 했을 때 -->
+    <div th:if="${!hasWrittenToday}" class="write-prompt">
+        <div class="write-prompt-inner">
+            <h2>오늘의 Two-Do를 작성하세요</h2>
+            <p th:if="${param.alreadyWritten == null}">하루 2가지 핵심 목표를 설정하고 포인트를 획득하세요!</p>
+            <a href="/write" class="btn btn-primary">오늘의 목표 작성하기 →</a>
+        </div>
+    </div>
+
+    <!-- 오늘 작성한 경우 -->
+    <div th:if="${hasWrittenToday}">
+        <div class="today-header">
+            <h2>오늘의 Two-Do</h2>
+            <span th:if="${todayList.earlyBonus}" class="early-badge">🌅 조기 작성 보너스 획득!</span>
+            <span class="earned-pts" th:text="'오늘 획득: +' + ${todayList.pointsEarned} + 'pt'"></span>
+        </div>
+
+        <div class="todo-section">
+            <div class="section-label">✦ Two 목표</div>
+            <div th:each="todo : ${todos}" th:if="${todo.two}">
+                <form method="post" th:action="'/todo/' + ${todo.id} + '/complete'" class="todo-row two-row">
+                    <span class="todo-content" th:classappend="${todo.completed} ? 'done'" th:text="${todo.content}"></span>
+                    <span class="todo-pts" th:if="${todo.completed}" th:text="'+' + ${todo.pointsEarned} + 'pt'"></span>
+                    <button th:if="${!todo.completed}" type="submit" class="btn-check">완료</button>
+                    <span th:if="${todo.completed}" class="check-done">✓</span>
+                </form>
+            </div>
+        </div>
+
+        <div class="todo-section" th:if="${#lists.size(todos) > 2}">
+            <div class="section-label">추가 목표</div>
+            <div th:each="todo : ${todos}" th:if="${!todo.two}">
+                <form method="post" th:action="'/todo/' + ${todo.id} + '/complete'" class="todo-row">
+                    <span class="todo-content" th:classappend="${todo.completed} ? 'done'" th:text="${todo.content}"></span>
+                    <span class="todo-pts" th:if="${todo.completed}" th:text="'+' + ${todo.pointsEarned} + 'pt'"></span>
+                    <button th:if="${!todo.completed}" type="submit" class="btn-check">완료</button>
+                    <span th:if="${todo.completed}" class="check-done">✓</span>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 히스토리 -->
+    <div class="history-section" th:if="${#lists.size(history) > 0}">
+        <h3>지난 기록</h3>
+        <div th:each="h : ${history}" th:if="${h.date != T(java.time.LocalDate).now()}" class="history-row">
+            <span th:text="${h.date}"></span>
+            <span th:if="${h.earlyBonus}" class="early-badge-sm">🌅</span>
+            <span class="hist-pts" th:text="'+' + ${h.pointsEarned} + 'pt'"></span>
+        </div>
+    </div>
+</div>
+</body>
+</html>

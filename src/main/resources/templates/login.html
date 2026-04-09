@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>로그인 - Two-Do</title>
+    <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="auth-page">
+<div class="auth-box">
+    <a href="/" class="logo">✦ Two-Do</a>
+    <h2>로그인</h2>
+    <div th:if="${error}" class="alert-error" th:text="${error}"></div>
+    <div th:if="${param.registered}" class="alert-success">회원가입 완료! 로그인하세요.</div>
+    <form method="post" action="/login">
+        <input type="text" name="username" placeholder="아이디" required/>
+        <input type="password" name="password" placeholder="비밀번호" required/>
+        <button type="submit" class="btn btn-primary w-full">로그인</button>
+    </form>
+    <p class="switch-link">계정이 없으신가요? <a href="/register">회원가입</a></p>
+</div>
+</body>
+</html>
