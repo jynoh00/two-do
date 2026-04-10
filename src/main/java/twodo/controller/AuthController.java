@@ -28,13 +28,16 @@ public class AuthController {
     @PostMapping("/register")
     public String register(@RequestParam String username,
                            @RequestParam String password,
+                           @RequestParam String passwordCheck,
                            @RequestParam String nickname,
                            Model model) {
         try {
-            userService.register(username, password, nickname);
+            userService.register(username, password, passwordCheck, nickname);
             return "redirect:/login?registered=true";
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
+            model.addAttribute("username", username);
+            model.addAttribute("nickname", nickname);
             return "register";
         }
     }

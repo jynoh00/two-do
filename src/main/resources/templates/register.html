@@ -10,10 +10,18 @@
     <a href="/" class="logo">✦ Two-Do</a>
     <h2>회원가입</h2>
     <div th:if="${error}" class="alert-error" th:text="${error}"></div>
+<!--    <form method="post" action="/register">-->
+<!--        <input type="text" name="username" placeholder="아이디" required/>-->
+<!--        <input type="password" name="password" placeholder="비밀번호" required/>-->
+<!--        <input type="password" name="passwordCheck" placeholder="비밀번호 재입력" required/>-->
+<!--        <input type="text" name="nickname" placeholder="닉네임" required/>-->
+<!--        <button type="submit" class="btn btn-primary w-full">회원가입</button>-->
+<!--    </form>-->
     <form method="post" action="/register">
-        <input type="text" name="username" placeholder="아이디" required/>
+        <input type="text"     name="username" th:value="${username}" placeholder="아이디" required/>
         <input type="password" name="password" placeholder="비밀번호" required/>
-        <input type="text" name="nickname" placeholder="닉네임" required/>
+        <input type="password" name="passwordCheck" placeholder="비밀번호 재입력" required/>
+        <input type="text"     name="nickname" th:value="${nickname}" placeholder="닉네임" required/>
         <button type="submit" class="btn btn-primary w-full">회원가입</button>
     </form>
     <p class="switch-link">이미 계정이 있으신가요? <a href="/login">로그인</a></p>
