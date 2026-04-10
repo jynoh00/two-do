@@ -83,19 +83,26 @@ public class TodoService {
 
         if (todo.isCompleted()) return todo;
 
+        TodoList todoList = todoListRepository.findById(todo.getTodoList().getId())
+                        .orElseThrow(() -> new RuntimeException("투두리스트를 찾을 수 없습니다."));
+
         todo.setCompleted(true);
         int pts = pointService.calcTodoDonePoints(todo.isTwo());
         todo.setPointsEarned(pts);
         todoRepository.save(todo);
 
         userService.addPoints(user, pts);
+        addPointsToTodoList(todoList, pts);
 
         // Todo: 포인트서비스에서 하는게 좋지 않을까
         if (todo.isTwo()) {
             List<Todo> twoDos = todoRepository.findByTodoListAndIsTwo(todo.getTodoList(), true);
             boolean allDone = twoDos.stream().allMatch(Todo::isCompleted);
 
-            if (allDone) userService.addPoints(user, PointService.TWO_ALL_DONE_BONUS);
+            if (allDone) {
+                userService.addPoints(user, PointService.TWO_ALL_DONE_BONUS);
+                addPointsToTodoList(todoList, PointService.TWO_ALL_DONE_BONUS);
+            }
         }
 
         return todo;
@@ -111,5 +118,10 @@ public class TodoService {
 
     public List<TodoList> getHistory(User user) {
         return todoListRepository.findByUserOrderByDateDesc(user);
+    }
+
+    public void addPointsToTodoList(TodoList todoList, int pts) {
+        todoList.setPointsEarned(todoList.getPointsEarned() + pts);
+        todoListRepository.save(todoList);
     }
 }
