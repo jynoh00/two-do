@@ -120,7 +120,7 @@ public class TodoService {
         return todoListRepository.findByUserOrderByDateDesc(user);
     }
 
-    public void addPointsToTodoList(TodoList todoList, int pts) {
+    private void addPointsToTodoList(TodoList todoList, int pts) {
         todoList.setPointsEarned(todoList.getPointsEarned() + pts);
         todoListRepository.save(todoList);
     }
