@@ -242,3 +242,60 @@ src/main/
 
 ## 발생 문제 및 해결 과정
 
+### - 문제 : `todoList` 객체 : 각 개별 `todo` 완료 시 점수 추가되지 않는 문제 발생
+> 관련 키워드 : `FetchType.LAZY` `Proxy` `JPA` `persistence context`
+
+`todo`의 집합인 `todoList`에서 당일 전체 휙득 점수를 저장하도록 설계하였지만, 반영이 안되는 문제가 발생하였다.<br>
+확인 결과 `todo`를 통한 휙득 점수가 `todoList`에서 연산 적용이 안되었기에
+
+```java
+private void addPointsToTodoList(TodoList todoList, int pts) {
+    todoList.setPointsEarned(todoList.getPointsEarned() + pts);
+    todoListRepository.save(todoList);
+}
+```
+
+내부 `private` 멤버 메서드 `addPointsToTodoList`를 선언하여, 활용하도록 추가하였다.
+
+```java
+// todoService: completeTodo 메서드 일부
+...
+userService.addPoints(user, pts);
+addPointsToTodoList(todo.getTodoList(), pts);  // 추가
+
+if (todo.isTwo()) {
+    List<Todo> twoDos = todoRepository.findByTodoListAndIsTwo(todo.getTodoList(), true);
+    boolean allDone = twoDos.stream().allMatch(Todo::isCompleted);
+
+    if (allDone) {
+        userService.addPoints(user, PointService.TWO_ALL_DONE_BONUS);
+        addPointsToTodoList(todo.getTodoList(), PointService.TWO_ALL_DONE_BONUS); // 추가
+    }
+}
+...
+```
+
+그러나 위와 같은 방식으로 변경한 이후, `allDone`의 경우, `addPointsToTodoList`메서드가 반영이 안되는 문제가 발생하였다.<br>
+
+```java
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "todo_list_id")
+private TodoList todoList;
+```
+
+`Todo` 클래스의 `todoList`는 `LAZY`로 패치타입이 설정되어 있다. 따라서 `todoRepository.findById(todoId)`로 `Todo`를 가져올 때<br>
+`todo.getTodoList()`는 실제 객체가 아닌 `프록시`이다.
+
+따라서 해당 프록시를 매개변수로한 `addPointsToTodoList()` 메서드에서 실행된 메서드들은 `DB`에 반영이 안된 것이다.
+
+정확히 하자면, `todo.getTodoList()`는 프록시지만, 프록시도 실제 데이터에 접근하는 순간 초기화되어 정상 작동한다.<br>
+그러나 사이에 `save()`, `findBy..()`와 같은 다른 `DB`작업이 수행되며 영속성 컨텍스트의 상태가 달라져 두번째 호출이 불안정해진 것이다.
+
+따라서 매개변수로 `todo.getTodoList()`가 아닌
+
+```java
+TodoList todoList = todoListRepository.findById(todo.getTodoList().getId())
+                .orElseThrow(() -> new RuntimeException("투두리스트를 찾을 수 없습니다."));
+```
+
+미리 실제 객체를 받아온 `todoList`를 매개변수로 동일 객체에 접근하게 하여 안정적으로 `DB`에 반영되도록 하였다.
