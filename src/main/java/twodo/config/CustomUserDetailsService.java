@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import twodo.common.ErrorMessage;
 import twodo.model.User;
 import twodo.repository.UserRepository;
 
@@ -17,7 +18,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("사용자 없음: " + username));
+                .orElseThrow(() -> new UsernameNotFoundException(ErrorMessage.USERNAME_NOT_FOUND + username));
 
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUsername())

@@ -3,6 +3,7 @@ package twodo.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import twodo.common.ErrorMessage;
 import twodo.model.*;
 import twodo.repository.*;
 
@@ -26,11 +27,11 @@ public class TodoService {
     @Transactional
     public TodoList createTodoList(User user, List<String> twoContents, List<String> extraContents) {
         if (hasWrittenToday(user)) {
-            throw new IllegalArgumentException("이미 투두리스트를 작성했습니다.");
+            throw new IllegalArgumentException(ErrorMessage.TODO_LIST_ALREADY_EXISTS);
         }
 
         if (twoContents == null || twoContents.size() != 2) {
-            throw new IllegalArgumentException("Two 목표는 정확히 2개여야 합니다.");
+            throw new IllegalArgumentException(ErrorMessage.TWO_GOALS_REQUIRED);
         }
 
         // 10시 이전 보너스 로직
@@ -79,12 +80,12 @@ public class TodoService {
     @Transactional
     public Todo completeTodo(Long todoId, User user) {
         Todo todo = todoRepository.findById(todoId)
-                .orElseThrow(() -> new RuntimeException("투두를 찾을 수 없습니다."));
+                .orElseThrow(() -> new RuntimeException(ErrorMessage.TODO_NOT_FOUND));
 
         if (todo.isCompleted()) return todo;
 
         TodoList todoList = todoListRepository.findById(todo.getTodoList().getId())
-                        .orElseThrow(() -> new RuntimeException("투두리스트를 찾을 수 없습니다."));
+                        .orElseThrow(() -> new RuntimeException(ErrorMessage.TODO_LIST_NOT_FOUND));
 
         todo.setCompleted(true);
         int pts = pointService.calcTodoDonePoints(todo.isTwo());

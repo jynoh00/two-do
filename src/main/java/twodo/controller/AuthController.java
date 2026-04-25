@@ -6,6 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import twodo.common.ErrorMessage;
 import twodo.service.UserService;
 
 @Controller
@@ -16,7 +17,7 @@ public class AuthController {
 
     @GetMapping("/login")
     public String loginPage(@RequestParam(required = false) String error, Model model) {
-        if (error != null) model.addAttribute("error", "아이디 또는 비밀번호가 올바르지 않습니다.");
+        if (error != null) model.addAttribute("error", ErrorMessage.INVALID_CREDENTIALS);
         return "login";
     }
 
