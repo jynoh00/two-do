@@ -199,6 +199,8 @@ src/main/
 
 ## 데이터 모델
 
+<img src="images/db1.png" width="100%">
+
 ### User
 | 필드 | 타입 | 설명 |
 |------|------|------|
@@ -209,13 +211,13 @@ src/main/
 | totalPoints | int | 누적 포인트 |
 
 ### TodoList (하루치 Two-Do 정보)
-| 필드 | 타입 | 설명 |
-|------|------|------|
-| id | Long | PK |
-| user | User | FK |
-| date | LocalDate | 작성 날짜 |
-| createdAt | LocalDateTime | 정확한 작성 시각 |
-| pointsEarned | int | 이 날 획득 포인트 |
+| 필드 | 타입 | 설명           |
+|------|------|--------------|
+| id | Long | PK           |
+| user | User | FK           |
+| date | LocalDate | 작성 날짜        |
+| createdAt | LocalDateTime | 정확한 작성 시각    |
+| pointsEarned | int | 당일 획득 포인트    |
 | earlyBonus | boolean | 10시 이전 작성 여부 |
 
 ### Todo (개별 목표)
