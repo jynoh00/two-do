@@ -36,7 +36,7 @@ public class TodoService {
 
         // 10시 이전 보너스 로직
         LocalDateTime now = LocalDateTime.now();
-        boolean earlyBonus = now.getHour() < 10;
+        boolean earlyBonus = pointService.isEarlyBonus(now);
 
         TodoList todoList = TodoList.builder()
                 .user(user)
@@ -70,8 +70,11 @@ public class TodoService {
         }
 
         int pts = pointService.calcWritePoints(earlyBonus);
+
+        // todoList 생성 및 초기 작성 점수 부여하여, 데이터베이스에 저장
         todoList.setPointsEarned(pts);
         todoListRepository.save(todoList);
+
         userService.addPoints(user, pts);
 
         return todoList;
@@ -85,26 +88,12 @@ public class TodoService {
         if (todo.isCompleted()) return todo;
 
         TodoList todoList = todoListRepository.findById(todo.getTodoList().getId())
-                        .orElseThrow(() -> new RuntimeException(ErrorMessage.TODO_LIST_NOT_FOUND));
+                .orElseThrow(() -> new RuntimeException(ErrorMessage.TODO_LIST_NOT_FOUND));
 
         todo.setCompleted(true);
-        int pts = pointService.calcTodoDonePoints(todo.isTwo());
-        todo.setPointsEarned(pts);
+        pointService.grantTodoDonePoints(todo, todoList, user);
+        todoListRepository.save(todoList);
         todoRepository.save(todo);
-
-        userService.addPoints(user, pts);
-        addPointsToTodoList(todoList, pts);
-
-        // Todo: 포인트서비스에서 하는게 좋지 않을까
-        if (todo.isTwo()) {
-            List<Todo> twoDos = todoRepository.findByTodoListAndIsTwo(todo.getTodoList(), true);
-            boolean allDone = twoDos.stream().allMatch(Todo::isCompleted);
-
-            if (allDone) {
-                userService.addPoints(user, PointService.TWO_ALL_DONE_BONUS);
-                addPointsToTodoList(todoList, PointService.TWO_ALL_DONE_BONUS);
-            }
-        }
 
         return todo;
     }
@@ -119,10 +108,5 @@ public class TodoService {
 
     public List<TodoList> getHistory(User user) {
         return todoListRepository.findByUserOrderByDateDesc(user);
-    }
-
-    private void addPointsToTodoList(TodoList todoList, int pts) {
-        todoList.setPointsEarned(todoList.getPointsEarned() + pts);
-        todoListRepository.save(todoList);
     }
 }
