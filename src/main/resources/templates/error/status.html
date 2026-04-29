@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
     <title>404 - Two-Do</title>
@@ -8,8 +8,8 @@
 <body class="auth-page">
 <div class="auth-box" style="text-align:center;">
     <a href="/" class="logo">✦ Two-Do</a>
-    <h2 style="font-size:3rem; margin: 1rem 0;">404</h2>
-    <p style="color:var(--muted); margin-bottom:1.5rem;">페이지를 찾을 수 없습니다.</p>
+    <h2 style="font-size:3rem; margin: 1rem 0;" th:text="${errCode}"></h2>
+<!--    <p style="color:var(&#45;&#45;muted); margin-bottom:1.5rem;">페이지를 찾을 수 없습니다.</p>-->
     <a href="/" class="btn btn-primary">홈으로 돌아가기</a>
 </div>
 </body>
