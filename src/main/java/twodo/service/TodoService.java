@@ -85,6 +85,11 @@ public class TodoService {
         Todo todo = todoRepository.findById(todoId)
                 .orElseThrow(() -> new RuntimeException(ErrorMessage.TODO_NOT_FOUND));
 
+        // 소유자 검증
+        if (!todo.getTodoList().getUser().getId().equals(user.getId())) {
+            throw new RuntimeException(ErrorMessage.FORBIDDEN);
+        }
+
         if (todo.isCompleted()) return todo;
 
         TodoList todoList = todoListRepository.findById(todo.getTodoList().getId())
@@ -100,6 +105,10 @@ public class TodoService {
 
     public TodoList getTodayList(User user) {
         return todoListRepository.findByUserAndDate(user, LocalDate.now()).orElse(null);
+    }
+
+    public TodoList getTodoListById(Long todoListId) {
+        return todoListRepository.findById(todoListId).orElse(null);
     }
 
     public List<Todo> getTodos(TodoList todoList) {

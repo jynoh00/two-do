@@ -17,4 +17,6 @@ public class ErrorMessage {
     public static final String TODO_LIST_NOT_FOUND = "투두리스트를 찾을 수 없습니다.";
     public static final String TODO_LIST_ALREADY_EXISTS = "이미 투두리스트를 작성했습니다.";
     public static final String TWO_GOALS_REQUIRED = "Two 목표는 정확히 2개여야 합니다.";
+
+    public static final String FORBIDDEN = "접근 권한이 없습니다.";
 }
